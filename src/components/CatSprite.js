@@ -4,6 +4,7 @@ import useCatSprite from "../hooks/useCatSprite";
 
 export default function CatSprite() {
   const { position, rotation } = useCatSpriteContext();
+  const { onSpriteClicked } = useCatSprite();
 
   return (
     <div>
@@ -17,6 +18,7 @@ export default function CatSprite() {
         style={{
           transform: `translate(${position.x}px, ${position.y}px) rotate(${rotation}deg)`,
         }}
+        onClick={onSpriteClicked}
       >
         <g>
           <g id="Page-1" stroke="none" fillRule="evenodd">

@@ -44,7 +44,9 @@ const useCatSprite = () => {
   };
 
   const onSpriteClicked = () => {
-    console.log("spriteClicked");
+    const events = operations[Constants.EVENTS.SPRITE_CLICK];
+    runEvents(events);
+    console.log(events);
   };
 
   return {
