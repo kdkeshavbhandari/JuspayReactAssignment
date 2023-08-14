@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ReactDOMServer from "react-dom/server";
 
-function DraggableDiv({ children }) {
+function DraggableDiv({ onClick, children }) {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleDragStart = (e) => {
@@ -11,6 +11,10 @@ function DraggableDiv({ children }) {
   const handleDragEnd = (e) => {
     setIsDragging(false);
     const { clientX, clientY } = e;
+    console.log(clientX, clientY);
+    if (clientX < 300) {
+      return;
+    }
     const newPositionDiv = document.createElement("div");
     const htmlString = ReactDOMServer.renderToString(children);
     newPositionDiv.className = "dragged-div";
@@ -24,6 +28,7 @@ function DraggableDiv({ children }) {
 
   return (
     <div
+      onClick={onClick}
       className={`original-div ${isDragging ? "dragging" : ""}`}
       draggable
       onDragStart={handleDragStart}
