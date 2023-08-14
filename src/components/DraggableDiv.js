@@ -5,6 +5,7 @@ import { useCatSpriteContext } from "../context/CatSpriteContext";
 
 function DraggableDiv({ type, onClick, children }) {
   const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const { operations, setOperations } = useCatSpriteContext();
 
   const handleEvents = () => {
@@ -27,20 +28,21 @@ function DraggableDiv({ type, onClick, children }) {
 
   const handleDragStart = (e) => {
     setIsDragging(true);
+    setDragStart({ x: e.clientX, y: e.clientY });
   };
 
   const handleDragEnd = (e) => {
     setIsDragging(false);
     const { clientX, clientY } = e;
-    // console.log(clientX, clientY);
-    if (clientX < 300) {
-      return;
-    }
     const newPositionDiv = document.createElement("div");
     const htmlString = ReactDOMServer.renderToString(children);
     newPositionDiv.className = "dragged-div";
-    newPositionDiv.style.left = `${clientX}px`;
-    newPositionDiv.style.top = `${clientY}px`;
+    newPositionDiv.style.left = `${
+      clientX - dragStart.x + e.target.getBoundingClientRect().left
+    }px`;
+    newPositionDiv.style.top = `${
+      clientY - dragStart.y + e.target.getBoundingClientRect().top
+    }px`;
     newPositionDiv.style.position = "absolute";
     newPositionDiv.innerHTML = htmlString;
     const midAreaDiv = document.getElementById("midArea");
