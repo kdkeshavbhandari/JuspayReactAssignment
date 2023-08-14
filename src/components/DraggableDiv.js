@@ -17,13 +17,15 @@ function DraggableDiv({ type, onClick, children }) {
     }
   };
 
-  const handleMotions = () => {
-    if (Object.values(Constants.MOTION).includes(type)) {
-      if (operations[Constants.EVENTS.FLAG_CLICK]) {
-        operations[Constants.EVENTS.FLAG_CLICK].push(type);
-      }
+  const handleMotions = (div) => {
+    const classList = div?.classList;
+    if (classList[2]) {
+      operations[classList[2]].push(type);
     }
-    console.log(operations);
+  };
+
+  const isEvent = () => {
+    return Object.values(Constants.EVENTS).includes(type);
   };
 
   const handleDragStart = (e) => {
@@ -36,20 +38,59 @@ function DraggableDiv({ type, onClick, children }) {
     const { clientX, clientY } = e;
     const newPositionDiv = document.createElement("div");
     const htmlString = ReactDOMServer.renderToString(children);
-    newPositionDiv.className = "dragged-div";
-    newPositionDiv.style.left = `${
-      clientX - dragStart.x + e.target.getBoundingClientRect().left
-    }px`;
-    newPositionDiv.style.top = `${
-      clientY - dragStart.y + e.target.getBoundingClientRect().top
-    }px`;
-    newPositionDiv.style.position = "absolute";
+    console.log(isEvent());
+    newPositionDiv.className = isEvent()
+      ? `dragged-div event-dragged ${type}`
+      : "dragged-div";
     newPositionDiv.innerHTML = htmlString;
     const midAreaDiv = document.getElementById("midArea");
-    midAreaDiv.appendChild(newPositionDiv);
-    handleEvents();
-    handleMotions();
+    if (isEvent()) {
+      newPositionDiv.style.left = `${
+        clientX - dragStart.x + e.target.getBoundingClientRect().left
+      }px`;
+      newPositionDiv.style.top = `${
+        clientY - dragStart.y + e.target.getBoundingClientRect().top
+      }px`;
+      newPositionDiv.style.position = "absolute";
+      midAreaDiv.append(newPositionDiv);
+      handleEvents();
+    } else {
+      const closestEventDiv = getClosestDiv(clientX, clientY);
+      if (closestEventDiv) {
+        closestEventDiv.appendChild(newPositionDiv);
+      } else {
+        midAreaDiv.appendChild(newPositionDiv);
+      }
+      handleMotions(closestEventDiv);
+    }
   };
+
+  function getClosestDiv(clientX, clientY) {
+    let closestDiv = null;
+    let closestDistance = Infinity;
+
+    const divElements = document.getElementsByClassName("event-dragged");
+    console.log(divElements);
+    if (!divElements) {
+      return;
+    }
+    Array.from(divElements).forEach((div) => {
+      const divRect = div.getBoundingClientRect();
+      const centerX = divRect.left + divRect.width / 2;
+      const centerY = divRect.top + divRect.height / 2;
+
+      const distance = Math.sqrt(
+        (clientX - centerX) ** 2 + (clientY - centerY) ** 2
+      );
+
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestDiv = div;
+      }
+    });
+
+    return closestDiv;
+  }
 
   return (
     <div
