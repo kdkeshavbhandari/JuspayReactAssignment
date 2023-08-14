@@ -7,10 +7,18 @@ const CatSpriteContext = createContext();
 export function CatSpriteContextProvider({ children }) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [rotation, setRotation] = useState(0);
+  const [operations, setOperations] = useState({});
 
   return (
     <CatSpriteContext.Provider
-      value={{ position, setPosition, rotation, setRotation }}
+      value={{
+        position,
+        setPosition,
+        rotation,
+        setRotation,
+        operations,
+        setOperations,
+      }}
     >
       {children}
     </CatSpriteContext.Provider>

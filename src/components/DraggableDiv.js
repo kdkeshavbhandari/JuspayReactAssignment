@@ -1,8 +1,29 @@
 import React, { useState } from "react";
 import ReactDOMServer from "react-dom/server";
+import Constants from "../assets/constants/Constants";
+import { useCatSpriteContext } from "../context/CatSpriteContext";
 
-function DraggableDiv({ onClick, children }) {
+function DraggableDiv({ type, onClick, children }) {
   const [isDragging, setIsDragging] = useState(false);
+  const { operations, setOperations } = useCatSpriteContext();
+
+  const handleEvents = () => {
+    if (Object.values(Constants.EVENTS).includes(type)) {
+      if (operations[type]) {
+        return;
+      }
+      operations[type] = [];
+    }
+  };
+
+  const handleMotions = () => {
+    if (Object.values(Constants.MOTION).includes(type)) {
+      if (operations[Constants.EVENTS.FLAG_CLICK]) {
+        operations[Constants.EVENTS.FLAG_CLICK].push(type);
+      }
+    }
+    console.log(operations);
+  };
 
   const handleDragStart = (e) => {
     setIsDragging(true);
@@ -11,7 +32,7 @@ function DraggableDiv({ onClick, children }) {
   const handleDragEnd = (e) => {
     setIsDragging(false);
     const { clientX, clientY } = e;
-    console.log(clientX, clientY);
+    // console.log(clientX, clientY);
     if (clientX < 300) {
       return;
     }
@@ -24,6 +45,8 @@ function DraggableDiv({ onClick, children }) {
     newPositionDiv.innerHTML = htmlString;
     const midAreaDiv = document.getElementById("midArea");
     midAreaDiv.appendChild(newPositionDiv);
+    handleEvents();
+    handleMotions();
   };
 
   return (
